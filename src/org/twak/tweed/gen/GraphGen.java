@@ -58,7 +58,7 @@ public class GraphGen extends Gen implements ICanSave {
 		lineMat.setBoolean( "UseMaterialColors", true );
 		lineMat.getAdditionalRenderState().setLineWidth( 5f );
 				
-		for ( Point3d pt : graph.getAllDiscrete() ) {
+		for ( Point3d p1 : graph.getAllDiscrete() ) {
 
 			Box box1 = new Box( 2f, 2f, 2f );
 			Geometry geom = new Geometry( "Box", box1 );
@@ -67,11 +67,11 @@ public class GraphGen extends Gen implements ICanSave {
 				@Override
 				public void posChanged() {
 					
-					List<Point3d> to = graph.get( pt );
-					graph.remove( pt );
-					pt.set( Jme3z.from( geom.getLocalTranslation() ) );
-					graph.putAll( pt, to );
-					
+					List<Point3d> to = graph.get( p1 );
+					graph.remove( p1 );
+					p1.set( Jme3z.from( geom.getLocalTranslation() ) );
+					graph.putAll( p1, to );
+					System.out.println(p1);
 					calculate();
 				}
 			} } );
@@ -84,14 +84,31 @@ public class GraphGen extends Gen implements ICanSave {
 			mat.setBoolean( "UseMaterialColors", true );
 
 			geom.setMaterial( mat );
-			geom.setLocalTranslation( (float) pt.x, (float) pt.y, (float) pt.z );
+			geom.setLocalTranslation( (float) p1.x, (float) p1.y, (float) p1.z );
 			gNode.attachChild( geom );
 			
-			for (Point3d p2 : graph.get( pt )) {
-				Line line = new Line ( Jme3z.to( pt ), Jme3z.to( p2) );
+			for (Point3d p2 : graph.get( p1 )) {
+				Line line = new Line ( Jme3z.to( p1 ), Jme3z.to( p2) );
 				Geometry lg = new Geometry("line", line);
 				lg.setMaterial( lineMat );
 				gNode.attachChild( lg );
+
+				Point3d p3 = new Point3d((p2.x+p1.x)/2, (p2.y+p1.y)/2, (p2.z+p1.z)/2);
+				Box box2 = new Box(2f, 2f, 2f);
+				Geometry bg = new Geometry("box", box2);
+//				bg.setUserData(EventMoveHandle.class.getSimpleName(), new Object[] {
+//
+//				});
+				ColorRGBA col2 = new ColorRGBA( 1f, 1f , 0, 1f );
+				Material mat2 = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+
+				mat2.setColor( "Diffuse", col2 );
+				mat2.setColor( "Ambient", col2 );
+				mat2.setBoolean( "UseMaterialColors", true );
+
+				bg.setMaterial(mat2);
+				bg.setLocalTranslation( (float) p3.x, (float) p3.y, (float) p3.z );
+				gNode.attachChild( bg );
 			}
 		}
 	}
