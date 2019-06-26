@@ -93,12 +93,11 @@ public class GraphGen extends Gen implements ICanSave {
 				lg.setMaterial( lineMat );
 				gNode.attachChild( lg );
 
+				// midpoint
 				Point3d p3 = new Point3d((p2.x+p1.x)/2, (p2.y+p1.y)/2, (p2.z+p1.z)/2);
 				Box box2 = new Box(2f, 2f, 2f);
 				Geometry bg = new Geometry("box", box2);
-//				bg.setUserData(EventMoveHandle.class.getSimpleName(), new Object[] {
-//
-//				});
+
 				ColorRGBA col2 = new ColorRGBA( 1f, 1f , 0, 1f );
 				Material mat2 = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
 
@@ -109,6 +108,45 @@ public class GraphGen extends Gen implements ICanSave {
 				bg.setMaterial(mat2);
 				bg.setLocalTranslation( (float) p3.x, (float) p3.y, (float) p3.z );
 				gNode.attachChild( bg );
+
+				// corners
+				Point3d vector = new Point3d(-(p2.z-p1.z), p2.y-p1.y, p2.x-p1.x);
+				double magnitude = Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2) + Math.pow(vector.z, 2));
+				Point3d v = new Point3d(vector.x*(10/magnitude), vector.y*(10/magnitude), vector.z*(10/magnitude));
+
+				Point3d c1 = new Point3d((p1.x+v.x), (p1.y+v.y), (p1.z+v.z));
+				Point3d c2 = new Point3d((p1.x-v.x), (p1.y-v.y), (p1.z-v.z));
+				Point3d c3 = new Point3d((p2.x+v.x), (p2.y+v.y), (p2.z+v.z));
+				Point3d c4 = new Point3d((p2.x-v.x), (p2.y-v.y), (p2.z-v.z));
+
+				Box b1 = new Box(1f, 1f, 1f);
+				Box b2 = new Box(1f, 1f, 1f);
+				Box b3 = new Box(1f, 1f, 1f);
+				Box b4 = new Box(1f, 1f, 1f);
+				Geometry g1 = new Geometry("box", b1);
+				Geometry g2 = new Geometry("box", b2);
+				Geometry g3 = new Geometry("box", b3);
+				Geometry g4 = new Geometry("box", b4);
+
+				ColorRGBA col3 = new ColorRGBA( 0, 1f , 1f, 1f );
+				Material mat3 = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+
+				mat3.setColor( "Diffuse", col3 );
+				mat3.setColor( "Ambient", col3 );
+				mat3.setBoolean( "UseMaterialColors", true );
+
+				g1.setMaterial(mat3);
+				g2.setMaterial(mat3);
+				g3.setMaterial(mat3);
+				g4.setMaterial(mat3);
+				g1.setLocalTranslation( (float) c1.x, (float) c1.y, (float) c1.z );
+				g2.setLocalTranslation( (float) c2.x, (float) c2.y, (float) c2.z );
+				g3.setLocalTranslation( (float) c3.x, (float) c3.y, (float) c3.z );
+				g4.setLocalTranslation( (float) c4.x, (float) c4.y, (float) c4.z );
+				gNode.attachChild( g1 );
+				gNode.attachChild( g2 );
+				gNode.attachChild( g3 );
+				gNode.attachChild( g4 );
 			}
 		}
 	}
