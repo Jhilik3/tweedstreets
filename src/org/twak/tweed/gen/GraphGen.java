@@ -1,6 +1,7 @@
 package org.twak.tweed.gen;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -8,6 +9,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.vecmath.Point3d;
 
+import com.jme3.scene.Mesh;
+import com.jme3.scene.VertexBuffer;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.twak.siteplan.jme.Jme3z;
@@ -15,6 +18,7 @@ import org.twak.tweed.EventMoveHandle;
 import org.twak.tweed.Tweed;
 import org.twak.tweed.TweedSettings;
 import org.twak.utils.Filez;
+import org.twak.utils.collections.Arrayz;
 import org.twak.utils.geom.Graph3D;
 import org.twak.viewTrace.GMLReader;
 
@@ -147,6 +151,39 @@ public class GraphGen extends Gen implements ICanSave {
 				gNode.attachChild( g2 );
 				gNode.attachChild( g3 );
 				gNode.attachChild( g4 );
+
+				Mesh m = new Mesh();
+				m.setMode(Mesh.Mode.Lines);
+
+				List<Float> coords = new ArrayList();
+				//List<Integer> inds = new ArrayList();
+
+				//inds.add( inds.size() );
+
+				coords.add( (float) c1.x );
+				coords.add( (float) c1.y );
+				coords.add( (float) c1.z );
+				coords.add( (float) c2.x );
+				coords.add( (float) c2.y );
+				coords.add( (float) c2.z );
+				coords.add( (float) c3.x );
+				coords.add( (float) c3.y );
+				coords.add( (float) c3.z );
+				coords.add( (float) c4.x );
+				coords.add( (float) c4.y );
+				coords.add( (float) c4.z );
+
+				m.setBuffer( VertexBuffer.Type.Position, 3, Arrayz.toFloatArray( coords ) );
+				//m.setBuffer( VertexBuffer.Type.Index   , 2, Arrayz.toIntArray  ( inds   ) );
+
+				Geometry mg = new Geometry("mesh", m);
+				mg.setCullHint(  Spatial.CullHint.Never );
+				Material lineMaterial = new Material( tweed.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md" );
+				lineMaterial.setColor( "Color", new ColorRGBA( 0, 1f, 1f, 1f ) );
+				mg.setMaterial( lineMaterial );
+
+				mg.setLocalTranslation( 0, 0, 0 );
+				gNode.attachChild( mg );
 			}
 		}
 	}
