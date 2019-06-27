@@ -9,8 +9,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.vecmath.Point3d;
 
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
+import com.jme3.util.BufferUtils;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.twak.siteplan.jme.Jme3z;
@@ -75,7 +78,6 @@ public class GraphGen extends Gen implements ICanSave {
 					graph.remove( p1 );
 					p1.set( Jme3z.from( geom.getLocalTranslation() ) );
 					graph.putAll( p1, to );
-					System.out.println(p1);
 					calculate();
 				}
 			} } );
@@ -116,7 +118,7 @@ public class GraphGen extends Gen implements ICanSave {
 				// corners
 				Point3d vector = new Point3d(-(p2.z-p1.z), p2.y-p1.y, p2.x-p1.x);
 				double magnitude = Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2) + Math.pow(vector.z, 2));
-				Point3d v = new Point3d(vector.x*(10/magnitude), vector.y*(10/magnitude), vector.z*(10/magnitude));
+				Point3d v = new Point3d(vector.x*(4/magnitude), vector.y*(4/magnitude), vector.z*(4/magnitude));
 
 				Point3d c1 = new Point3d((p1.x+v.x), (p1.y+v.y), (p1.z+v.z));
 				Point3d c2 = new Point3d((p1.x-v.x), (p1.y-v.y), (p1.z-v.z));
@@ -152,6 +154,7 @@ public class GraphGen extends Gen implements ICanSave {
 				gNode.attachChild( g3 );
 				gNode.attachChild( g4 );
 
+				// line mesh
 				Mesh m = new Mesh();
 				m.setMode(Mesh.Mode.Lines);
 
@@ -184,6 +187,45 @@ public class GraphGen extends Gen implements ICanSave {
 
 				mg.setLocalTranslation( 0, 0, 0 );
 				gNode.attachChild( mg );
+
+				// rectangle mesh
+				Mesh mesh = new Mesh();
+
+//				List<Vector3f> vertices = new ArrayList();
+//				vertices.add(new Vector3f((float) c2.x, (float) c2.y, (float) c2.z));
+//				vertices.add(new Vector3f((float) c4.x, (float) c4.y, (float) c4.z));
+//				vertices.add(new Vector3f((float) c1.x, (float) c1.y, (float) c1.z));
+//				vertices.add(new Vector3f((float) c3.x, (float) c3.y, (float) c3.z));
+				Vector3f[] vertices = new Vector3f[4];
+				vertices[0] = new Vector3f((float) c2.x, (float) c2.y, (float) c2.z);
+				vertices[1] = new Vector3f((float) c4.x, (float) c4.y, (float) c4.z);
+				vertices[2] = new Vector3f((float) c1.x, (float) c1.y, (float) c1.z);
+				vertices[3] = new Vector3f((float) c3.x, (float) c3.y, (float) c3.z);
+
+//				List<Vector2f> texCoord = new ArrayList();
+//				texCoord.add(new Vector2f(0,0));
+//				texCoord.add(new Vector2f(1,0));
+//				texCoord.add(new Vector2f(0,1));
+//				texCoord.add(new Vector2f(1,0));
+				Vector2f[] texCoord = new Vector2f[4];
+				texCoord[0] = new Vector2f(0,0);
+				texCoord[1] = new Vector2f(1,0);
+				texCoord[2] = new Vector2f(0,1);
+				texCoord[3] = new Vector2f(1,1);
+
+				int[] indices = { 2,3,1, 1,0,2 };
+
+				mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+				mesh.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoord));
+				mesh.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(indices));
+				//mesh.updateBound();
+
+				Geometry geo = new Geometry("mesh", mesh);
+				geo.setCullHint(  Spatial.CullHint.Never );
+				Material recmat = new Material(tweed.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+				recmat.setColor("Color", new ColorRGBA( 0, 0, 1f, 1f ));
+				geo.setMaterial(recmat);
+				gNode.attachChild(geo);
 			}
 		}
 	}
