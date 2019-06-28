@@ -115,7 +115,7 @@ public class GraphGen extends Gen implements ICanSave {
 				bg.setLocalTranslation( (float) p3.x, (float) p3.y, (float) p3.z );
 				gNode.attachChild( bg );
 
-				// corners
+				// rectangle corners
 				Point3d vector = new Point3d(-(p2.z-p1.z), p2.y-p1.y, p2.x-p1.x);
 				double magnitude = Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2) + Math.pow(vector.z, 2));
 				Point3d v = new Point3d(vector.x*(4/magnitude), vector.y*(4/magnitude), vector.z*(4/magnitude));
@@ -177,7 +177,7 @@ public class GraphGen extends Gen implements ICanSave {
 				coords.add( (float) c4.z );
 
 				m.setBuffer( VertexBuffer.Type.Position, 3, Arrayz.toFloatArray( coords ) );
-				//m.setBuffer( VertexBuffer.Type.Index   , 2, Arrayz.toIntArray  ( inds   ) );
+				//m.setBuffer( VertexBuffer.Type.Index, 2, Arrayz.toIntArray(inds) );
 
 				Geometry mg = new Geometry("mesh", m);
 				mg.setCullHint(  Spatial.CullHint.Never );
@@ -191,22 +191,12 @@ public class GraphGen extends Gen implements ICanSave {
 				// rectangle mesh
 				Mesh mesh = new Mesh();
 
-//				List<Vector3f> vertices = new ArrayList();
-//				vertices.add(new Vector3f((float) c2.x, (float) c2.y, (float) c2.z));
-//				vertices.add(new Vector3f((float) c4.x, (float) c4.y, (float) c4.z));
-//				vertices.add(new Vector3f((float) c1.x, (float) c1.y, (float) c1.z));
-//				vertices.add(new Vector3f((float) c3.x, (float) c3.y, (float) c3.z));
 				Vector3f[] vertices = new Vector3f[4];
 				vertices[0] = new Vector3f((float) c2.x, (float) c2.y, (float) c2.z);
 				vertices[1] = new Vector3f((float) c4.x, (float) c4.y, (float) c4.z);
 				vertices[2] = new Vector3f((float) c1.x, (float) c1.y, (float) c1.z);
 				vertices[3] = new Vector3f((float) c3.x, (float) c3.y, (float) c3.z);
 
-//				List<Vector2f> texCoord = new ArrayList();
-//				texCoord.add(new Vector2f(0,0));
-//				texCoord.add(new Vector2f(1,0));
-//				texCoord.add(new Vector2f(0,1));
-//				texCoord.add(new Vector2f(1,0));
 				Vector2f[] texCoord = new Vector2f[4];
 				texCoord[0] = new Vector2f(0,0);
 				texCoord[1] = new Vector2f(1,0);
