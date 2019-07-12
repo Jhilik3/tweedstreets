@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -15,6 +16,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
+import org.lwjgl.Sys;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.twak.siteplan.jme.Jme3z;
 import org.twak.tweed.EventMoveHandle;
@@ -23,6 +25,8 @@ import org.twak.tweed.TweedSettings;
 import org.twak.utils.Filez;
 import org.twak.utils.collections.Arrayz;
 import org.twak.utils.geom.Graph3D;
+import org.twak.utils.geom.Junction;
+import org.twak.utils.geom.Street;
 import org.twak.viewTrace.GMLReader;
 
 import com.jme3.material.Material;
@@ -36,17 +40,22 @@ public class GraphGen extends Gen implements ICanSave {
 
 	public File source;
 	
-	public Graph3D graph;
-	
+//	public Graph3D graph;
+
+	public Set<Junction> jns;
+
 	public GraphGen() {}
 	public GraphGen( File source, Tweed tweed ) {
 		super( Filez.stripExtn( source.getName( )), tweed);
 		this.source = source;
 
-		CoordinateReferenceSystem crss = Tweed.kludgeCMS.get( TweedSettings.settings.gmlCoordSystem );		
-		graph = GMLReader.readGMLGraph( Tweed.toWorkspace( source ), DefaultGeocentricCRS.CARTESIAN, crss );
+		CoordinateReferenceSystem crss = Tweed.kludgeCMS.get( TweedSettings.settings.gmlCoordSystem );
+		Graph3D graph = GMLReader.readGMLGraph( Tweed.toWorkspace( source ), DefaultGeocentricCRS.CARTESIAN, crss );
 		
-		graph.transform ( TweedSettings.settings.toOrigin );		
+		graph.transform ( TweedSettings.settings.toOrigin );
+
+		jns = graph.getAllDiscrete();
+
 	}
 	
 	@Override
@@ -64,8 +73,8 @@ public class GraphGen extends Gen implements ICanSave {
 		lineMat.setColor( "Ambient", Jme3z.toJme( color ) );
 		lineMat.setBoolean( "UseMaterialColors", true );
 		lineMat.getAdditionalRenderState().setLineWidth( 5f );
-				
-		for ( Point3d p1 : graph.getAllDiscrete() ) {
+
+		for ( Junction p1 : jns ) {
 
 			Box box1 = new Box( 2f, 2f, 2f );
 			Geometry geom = new Geometry( "Box", box1 );
@@ -73,11 +82,11 @@ public class GraphGen extends Gen implements ICanSave {
 			geom.setUserData( EventMoveHandle.class.getSimpleName(), new Object[] { new EventMoveHandle() {
 				@Override
 				public void posChanged() {
-					
-					List<Point3d> to = graph.get( p1 );
-					graph.remove( p1 );
+
+//					List<Point3d> to = graph.get( p1 );
+//					graph.remove( p1 );
 					p1.set( Jme3z.from( geom.getLocalTranslation() ) );
-					graph.putAll( p1, to );
+//					graph.putAll( p1, to );
 					calculate();
 				}
 			} } );
@@ -93,7 +102,10 @@ public class GraphGen extends Gen implements ICanSave {
 			geom.setLocalTranslation( (float) p1.x, (float) p1.y, (float) p1.z );
 			gNode.attachChild( geom );
 			
-			for (Point3d p2 : graph.get( p1 )) {
+			for (Street street : p1.streets ) {
+
+				Junction p2 = street.getOther(p1);
+
 				Line line = new Line ( Jme3z.to( p1 ), Jme3z.to( p2) );
 				Geometry lg = new Geometry("line", line);
 				lg.setMaterial( lineMat );
@@ -116,9 +128,8 @@ public class GraphGen extends Gen implements ICanSave {
 				gNode.attachChild( bg );
 
 				// rectangle corners
-				Point3d vector = new Point3d(-(p2.z-p1.z), p2.y-p1.y, p2.x-p1.x);
-				double magnitude = Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2) + Math.pow(vector.z, 2));
-				Point3d v = new Point3d(vector.x*(4/magnitude), vector.y*(4/magnitude), vector.z*(4/magnitude));
+				Vector3f vector = new Vector3f((float)-(p2.z-p1.z), (float)(p2.y-p1.y), (float)(p2.x-p1.x));
+				Vector3f v = new Vector3f(vector.x*(4/vector.length()), vector.y*(4/vector.length()), vector.z*(4/vector.length()));
 
 				Point3d c1 = new Point3d((p1.x+v.x), (p1.y+v.y), (p1.z+v.z));
 				Point3d c2 = new Point3d((p1.x-v.x), (p1.y-v.y), (p1.z-v.z));
@@ -216,6 +227,31 @@ public class GraphGen extends Gen implements ICanSave {
 				recmat.setColor("Color", new ColorRGBA( 0, 0, 1f, 1f ));
 				geo.setMaterial(recmat);
 				gNode.attachChild(geo);
+
+				// intersections
+				//Point3d intersect = new Point3d()
+
+
+			}
+			System.out.println("New junction:");
+			for (Street s : p1.streets) {
+				System.out.println(s.getVector());
+			}
+			System.out.println("");
+
+			if (p1.streets.size() == 1) {
+				Box j1 = new Box(3f, 3f, 3f);
+				Geometry g = new Geometry("box", j1);
+				ColorRGBA colj = new ColorRGBA( 1f, 1f , 1f, 1f );
+				Material matj = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+
+				matj.setColor( "Diffuse", colj );
+				matj.setColor( "Ambient", colj );
+				matj.setBoolean( "UseMaterialColors", true );
+
+				g.setMaterial(matj);
+				g.setLocalTranslation( (float) p1.x, (float) p1.y, (float) p1.z );
+				gNode.attachChild( g );
 			}
 		}
 	}
