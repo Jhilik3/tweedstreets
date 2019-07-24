@@ -112,20 +112,20 @@ public class GraphGen extends Gen implements ICanSave {
 				gNode.attachChild( lg );
 
 				// midpoint
-				Point3d p3 = new Point3d((p2.x+p1.x)/2, (p2.y+p1.y)/2, (p2.z+p1.z)/2);
-				Box box2 = new Box(2f, 2f, 2f);
-				Geometry bg = new Geometry("box", box2);
+//				Point3d p3 = new Point3d((p2.x+p1.x)/2, (p2.y+p1.y)/2, (p2.z+p1.z)/2);
+//				Box box2 = new Box(2f, 2f, 2f);
+//				Geometry bg = new Geometry("box", box2);
 
-				ColorRGBA col2 = new ColorRGBA( 1f, 1f , 0, 1f );
-				Material mat2 = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+//				ColorRGBA col2 = new ColorRGBA( 1f, 1f , 0, 1f );
+//				Material mat2 = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+//
+//				mat2.setColor( "Diffuse", col2 );
+//				mat2.setColor( "Ambient", col2 );
+//				mat2.setBoolean( "UseMaterialColors", true );
 
-				mat2.setColor( "Diffuse", col2 );
-				mat2.setColor( "Ambient", col2 );
-				mat2.setBoolean( "UseMaterialColors", true );
-
-				bg.setMaterial(mat2);
-				bg.setLocalTranslation( (float) p3.x, (float) p3.y, (float) p3.z );
-				gNode.attachChild( bg );
+//				bg.setMaterial(mat2);
+//				bg.setLocalTranslation( (float) p3.x, (float) p3.y, (float) p3.z );
+//				gNode.attachChild( bg );
 
 				// rectangle corners
 				Vector3f vector = new Vector3f((float)-(p2.z-p1.z), (float)(p2.y-p1.y), (float)(p2.x-p1.x));
@@ -152,18 +152,18 @@ public class GraphGen extends Gen implements ICanSave {
 				mat3.setColor( "Ambient", col3 );
 				mat3.setBoolean( "UseMaterialColors", true );
 
-				g1.setMaterial(mat3);
-				g2.setMaterial(mat3);
-				g3.setMaterial(mat3);
-				g4.setMaterial(mat3);
-				g1.setLocalTranslation( (float) c1.x, (float) c1.y, (float) c1.z );
-				g2.setLocalTranslation( (float) c2.x, (float) c2.y, (float) c2.z );
-				g3.setLocalTranslation( (float) c3.x, (float) c3.y, (float) c3.z );
-				g4.setLocalTranslation( (float) c4.x, (float) c4.y, (float) c4.z );
-				gNode.attachChild( g1 );
-				gNode.attachChild( g2 );
-				gNode.attachChild( g3 );
-				gNode.attachChild( g4 );
+//				g1.setMaterial(mat3);
+//				g2.setMaterial(mat2);
+//				g3.setMaterial(mat3);
+//				g4.setMaterial(mat);
+//				g1.setLocalTranslation( (float) c1.x, (float) c1.y, (float) c1.z );
+//				g2.setLocalTranslation( (float) c2.x, (float) c2.y, (float) c2.z );
+//				g3.setLocalTranslation( (float) c3.x, (float) c3.y, (float) c3.z );
+//				g4.setLocalTranslation( (float) c4.x, (float) c4.y, (float) c4.z );
+//				gNode.attachChild( g1 );
+//				gNode.attachChild( g2 );
+//				gNode.attachChild( g3 );
+//				gNode.attachChild( g4 );
 
 				// line mesh
 				Mesh m = new Mesh();
@@ -200,13 +200,89 @@ public class GraphGen extends Gen implements ICanSave {
 				gNode.attachChild( mg );
 
 				// rectangle mesh
+//				Mesh mesh = new Mesh();
+//
+//				Vector3f[] vertices = new Vector3f[4];
+//				vertices[0] = new Vector3f((float) c2.x, (float) c2.y, (float) c2.z);
+//				vertices[1] = new Vector3f((float) c4.x, (float) c4.y, (float) c4.z);
+//				vertices[2] = new Vector3f((float) c1.x, (float) c1.y, (float) c1.z);
+//				vertices[3] = new Vector3f((float) c3.x, (float) c3.y, (float) c3.z);
+//
+//				Vector2f[] texCoord = new Vector2f[4];
+//				texCoord[0] = new Vector2f(0,0);
+//				texCoord[1] = new Vector2f(1,0);
+//				texCoord[2] = new Vector2f(0,1);
+//				texCoord[3] = new Vector2f(1,1);
+//
+//				int[] indices = { 2,3,1, 1,0,2 };
+//
+//				mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+//				mesh.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoord));
+//				mesh.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(indices));
+//				//mesh.updateBound();
+//
+//				Geometry geo = new Geometry("mesh", mesh);
+//				geo.setCullHint(  Spatial.CullHint.Never );
+//				Material recmat = new Material(tweed.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+//				recmat.setColor("Color", new ColorRGBA( 0, 0, 1f, 1f ));
+//				geo.setMaterial(recmat);
+//				gNode.attachChild(geo);
+
+				// intersections
+				List<Street> temp = street.createTempStreets();
+
+				Box i = new Box(1f, 1f, 1f);
+				ColorRGBA coli = new ColorRGBA( 1f, 1f , 1f, 1f );
+				Material mati = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+
+				mati.setColor( "Diffuse", coli );
+				mati.setColor( "Ambient", coli );
+				mati.setBoolean( "UseMaterialColors", true );
+
+				if (temp.get(1) != null) {
+					Point3d intrsct1 = street.intersect(temp.get(0).getC2(), temp.get(0).getC4(), temp.get(1).getC1(), temp.get(1).getC3());
+					street.c2 = intrsct1;
+					Geometry gi1 = new Geometry("box", i);
+					gi1.setMaterial(mati);
+					gi1.setLocalTranslation( (float) intrsct1.x, (float) intrsct1.y, (float) intrsct1.z );
+					gNode.attachChild( gi1 );
+				}
+
+				if (temp.get(2) != null) {
+					Point3d intrsct2 = street.intersect(temp.get(0).getC1(), temp.get(0).getC3(), temp.get(2).getC2(), temp.get(2).getC4());
+					street.c1 = intrsct2;
+					Geometry gi2 = new Geometry("box", i);
+					gi2.setMaterial(mati);
+					gi2.setLocalTranslation( (float) intrsct2.x, (float) intrsct2.y, (float) intrsct2.z );
+					gNode.attachChild( gi2 );
+				}
+
+				if (temp.get(3) != null) {
+					Point3d intrsct3 = street.intersect(temp.get(0).getC1(), temp.get(0).getC3(), temp.get(3).getC2(), temp.get(3).getC4());
+					street.c3 = intrsct3;
+					Geometry gi3 = new Geometry("box", i);
+					gi3.setMaterial(mati);
+					gi3.setLocalTranslation( (float) intrsct3.x, (float) intrsct3.y, (float) intrsct3.z );
+					gNode.attachChild( gi3 );
+				}
+
+				if (temp.get(4) != null) {
+					Point3d intrsct4 = street.intersect(temp.get(0).getC2(), temp.get(0).getC4(), temp.get(4).getC1(), temp.get(4).getC3());
+					street.c4 = intrsct4;
+					Geometry gi4 = new Geometry("box", i);
+					gi4.setMaterial(mati);
+					gi4.setLocalTranslation( (float) intrsct4.x, (float) intrsct4.y, (float) intrsct4.z );
+					gNode.attachChild( gi4 );
+				}
+
+				// street mesh
 				Mesh mesh = new Mesh();
 
 				Vector3f[] vertices = new Vector3f[4];
-				vertices[0] = new Vector3f((float) c2.x, (float) c2.y, (float) c2.z);
-				vertices[1] = new Vector3f((float) c4.x, (float) c4.y, (float) c4.z);
-				vertices[2] = new Vector3f((float) c1.x, (float) c1.y, (float) c1.z);
-				vertices[3] = new Vector3f((float) c3.x, (float) c3.y, (float) c3.z);
+				vertices[0] = new Vector3f((float) street.c2.x, (float) street.c2.y, (float) street.c2.z);
+				vertices[1] = new Vector3f((float) street.c4.x, (float) street.c4.y, (float) street.c4.z);
+				vertices[2] = new Vector3f((float) street.c1.x, (float) street.c1.y, (float) street.c1.z);
+				vertices[3] = new Vector3f((float) street.c3.x, (float) street.c3.y, (float) street.c3.z);
 
 				Vector2f[] texCoord = new Vector2f[4];
 				texCoord[0] = new Vector2f(0,0);
@@ -228,31 +304,74 @@ public class GraphGen extends Gen implements ICanSave {
 				geo.setMaterial(recmat);
 				gNode.attachChild(geo);
 
-				// intersections
-				//Point3d intersect = new Point3d()
-
-
 			}
+
 			System.out.println("New junction:");
 			for (Street s : p1.streets) {
 				System.out.println(s.getVector());
 			}
 			System.out.println("");
 
-			if (p1.streets.size() == 1) {
-				Box j1 = new Box(3f, 3f, 3f);
-				Geometry g = new Geometry("box", j1);
-				ColorRGBA colj = new ColorRGBA( 1f, 1f , 1f, 1f );
-				Material matj = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+//			if (p1.streets.size() == 1) {
+//				Box j1 = new Box(3f, 3f, 3f);
+//				Geometry g = new Geometry("box", j1);
+//				ColorRGBA colj = new ColorRGBA( 1f, 1f , 1f, 1f );
+//				Material matj = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+//
+//				matj.setColor( "Diffuse", colj );
+//				matj.setColor( "Ambient", colj );
+//				matj.setBoolean( "UseMaterialColors", true );
+//
+//				g.setMaterial(matj);
+//				g.setLocalTranslation( (float) p1.x, (float) p1.y, (float) p1.z );
+//				gNode.attachChild( g );
+//			}
 
-				matj.setColor( "Diffuse", colj );
-				matj.setColor( "Ambient", colj );
-				matj.setBoolean( "UseMaterialColors", true );
+			// intersections
+//			if (p1.streets.size() == 2) {
+//				Street s1 = p1.streets.get(0);
+//				Junction o1 = s1.getOther(p1);
+//
+//				Vector3f perp1 = new Vector3f((float)-(o1.z-p1.z), (float)(o1.y-p1.y), (float)(o1.x-p1.x));
+//				Vector3f vec1 = new Vector3f(perp1.x*(4/perp1.length()), perp1.y*(4/perp1.length()), perp1.z*(4/perp1.length()));
+//
+//				Point3d cor1 = new Point3d((p1.x+vec1.x), (p1.y+vec1.y), (p1.z+vec1.z));
+//				Point3d cor2 = new Point3d((p1.x-vec1.x), (p1.y-vec1.y), (p1.z-vec1.z));
+//				Point3d cor3 = new Point3d((o1.x+vec1.x), (o1.y+vec1.y), (o1.z+vec1.z));
+//				Point3d cor4 = new Point3d((o1.x-vec1.x), (o1.y-vec1.y), (o1.z-vec1.z));
+//
+//				Street s2 = p1.streets.get(1);
+//				Junction o2 = s2.getOther(p1);
+//
+//				Vector3f perp2 = new Vector3f((float)-(o2.z-p1.z), (float)(o2.y-p1.y), (float)(o2.x-p1.x));
+//				Vector3f vec2 = new Vector3f(perp2.x*(4/perp2.length()), perp2.y*(4/perp2.length()), perp2.z*(4/perp2.length()));
+//
+//				Point3d co1 = new Point3d((p1.x+vec2.x), (p1.y+vec2.y), (p1.z+vec2.z));
+//				Point3d co2 = new Point3d((p1.x-vec2.x), (p1.y-vec2.y), (p1.z-vec2.z));
+//				Point3d co3 = new Point3d((o2.x+vec2.x), (o2.y+vec2.y), (o2.z+vec2.z));
+//				Point3d co4 = new Point3d((o2.x-vec2.x), (o2.y-vec2.y), (o2.z-vec2.z));
+//
+//				double denom = (cor1.x - cor3.x)*(co1.z - co3.z) - (cor1.z - cor3.z)*(co1.x - co3.x);
+//				Point3d intersect = new Point3d(((cor1.x*cor3.z - cor1.z*cor3.x)*(co1.x-co3.x) - (cor1.x-cor3.x)*(co1.x*co3.z - co1.z*co3.x))/denom, 0,
+//						((cor1.x*cor3.z - cor1.z*cor3.x)*(co1.z-co3.z) - (cor1.z-cor3.z)*(co1.x*co3.z - co1.z*co3.x))/denom);
+//
+//				System.out.println(intersect.toString());
+//
+//				Box i = new Box(1f, 1f, 1f);
+//				Geometry gi = new Geometry("box", i);
+//				ColorRGBA coli = new ColorRGBA( 1f, 1f , 1f, 1f );
+//				Material mati = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
+//
+//				mati.setColor( "Diffuse", coli );
+//				mati.setColor( "Ambient", coli );
+//				mati.setBoolean( "UseMaterialColors", true );
+//
+//				gi.setMaterial(mati);
+//				gi.setLocalTranslation( (float) intersect.x, (float) intersect.y, (float) intersect.z );
+//				gNode.attachChild( gi );
+//			}
 
-				g.setMaterial(matj);
-				g.setLocalTranslation( (float) p1.x, (float) p1.y, (float) p1.z );
-				gNode.attachChild( g );
-			}
+
 		}
 	}
 
