@@ -39,8 +39,6 @@ import com.jme3.scene.shape.Line;
 public class GraphGen extends Gen implements ICanSave {
 
 	public File source;
-	
-//	public Graph3D graph;
 
 	public Set<Junction> jns;
 
@@ -53,6 +51,20 @@ public class GraphGen extends Gen implements ICanSave {
 		Graph3D graph = GMLReader.readGMLGraph( Tweed.toWorkspace( source ), DefaultGeocentricCRS.CARTESIAN, crss );
 		
 		graph.transform ( TweedSettings.settings.toOrigin );
+
+		Graph3D myGraph = new Graph3D();
+		myGraph.put( new Point3d(0,0,0), new Point3d(100, 0, 0));
+		myGraph.put( new Point3d(0,0,0), new Point3d(0, 0, 100));
+		myGraph.put( new Point3d(0,0,0), new Point3d(-150, 0, 0));
+
+//		myGraph.put( new Point3d(100, 0, 0), new Point3d(0,0,0));
+//		myGraph.put( new Point3d(0, 0, 100), new Point3d(0,0,0));
+//		myGraph.put( new Point3d(-150, 0, 0), new Point3d(0,0,0));
+//
+		myGraph.put( new Point3d(100, 0, 0), new Point3d(100,0,50));
+		myGraph.put( new Point3d(100, 0, 0), new Point3d(100,0,-40));
+
+		graph = myGraph;
 
 		jns = graph.getAllDiscrete();
 
@@ -131,19 +143,19 @@ public class GraphGen extends Gen implements ICanSave {
 				Vector3f vector = new Vector3f((float)-(p2.z-p1.z), (float)(p2.y-p1.y), (float)(p2.x-p1.x));
 				Vector3f v = new Vector3f(vector.x*(4/vector.length()), vector.y*(4/vector.length()), vector.z*(4/vector.length()));
 
-				Point3d c1 = new Point3d((p1.x+v.x), (p1.y+v.y), (p1.z+v.z));
-				Point3d c2 = new Point3d((p1.x-v.x), (p1.y-v.y), (p1.z-v.z));
-				Point3d c3 = new Point3d((p2.x+v.x), (p2.y+v.y), (p2.z+v.z));
-				Point3d c4 = new Point3d((p2.x-v.x), (p2.y-v.y), (p2.z-v.z));
+				street.c1 = new Point3d((p1.x+v.x), (p1.y+v.y), (p1.z+v.z));
+				street.c2 = new Point3d((p1.x-v.x), (p1.y-v.y), (p1.z-v.z));
+				street.c3 = new Point3d((p2.x+v.x), (p2.y+v.y), (p2.z+v.z));
+				street.c4 = new Point3d((p2.x-v.x), (p2.y-v.y), (p2.z-v.z));
 
-				Box b1 = new Box(1f, 1f, 1f);
-				Box b2 = new Box(1f, 1f, 1f);
-				Box b3 = new Box(1f, 1f, 1f);
-				Box b4 = new Box(1f, 1f, 1f);
-				Geometry g1 = new Geometry("box", b1);
-				Geometry g2 = new Geometry("box", b2);
-				Geometry g3 = new Geometry("box", b3);
-				Geometry g4 = new Geometry("box", b4);
+//				Box b1 = new Box(1f, 1f, 1f);
+//				Box b2 = new Box(1f, 1f, 1f);
+//				Box b3 = new Box(1f, 1f, 1f);
+//				Box b4 = new Box(1f, 1f, 1f);
+//				Geometry g1 = new Geometry("box", b1);
+//				Geometry g2 = new Geometry("box", b2);
+//				Geometry g3 = new Geometry("box", b3);
+//				Geometry g4 = new Geometry("box", b4);
 
 				ColorRGBA col3 = new ColorRGBA( 0, 1f , 1f, 1f );
 				Material mat3 = new Material( tweed.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md" );
@@ -174,18 +186,18 @@ public class GraphGen extends Gen implements ICanSave {
 
 				//inds.add( inds.size() );
 
-				coords.add( (float) c1.x );
-				coords.add( (float) c1.y );
-				coords.add( (float) c1.z );
-				coords.add( (float) c2.x );
-				coords.add( (float) c2.y );
-				coords.add( (float) c2.z );
-				coords.add( (float) c3.x );
-				coords.add( (float) c3.y );
-				coords.add( (float) c3.z );
-				coords.add( (float) c4.x );
-				coords.add( (float) c4.y );
-				coords.add( (float) c4.z );
+//				coords.add( (float) street.c1.x );
+//				coords.add( (float) c1.y );
+//				coords.add( (float) c1.z );
+//				coords.add( (float) c2.x );
+//				coords.add( (float) c2.y );
+//				coords.add( (float) c2.z );
+//				coords.add( (float) c3.x );
+//				coords.add( (float) c3.y );
+//				coords.add( (float) c3.z );
+//				coords.add( (float) c4.x );
+//				coords.add( (float) c4.y );
+//				coords.add( (float) c4.z );
 
 				m.setBuffer( VertexBuffer.Type.Position, 3, Arrayz.toFloatArray( coords ) );
 				//m.setBuffer( VertexBuffer.Type.Index, 2, Arrayz.toIntArray(inds) );
@@ -239,40 +251,32 @@ public class GraphGen extends Gen implements ICanSave {
 				mati.setColor( "Ambient", coli );
 				mati.setBoolean( "UseMaterialColors", true );
 
-				if (temp.get(1) != null) {
-					Point3d intrsct1 = street.intersect(temp.get(0).getC2(), temp.get(0).getC4(), temp.get(1).getC1(), temp.get(1).getC3());
-					street.c2 = intrsct1;
-					Geometry gi1 = new Geometry("box", i);
-					gi1.setMaterial(mati);
-					gi1.setLocalTranslation( (float) intrsct1.x, (float) intrsct1.y, (float) intrsct1.z );
-					gNode.attachChild( gi1 );
-				}
-
 				if (temp.get(2) != null) {
-					Point3d intrsct2 = street.intersect(temp.get(0).getC1(), temp.get(0).getC3(), temp.get(2).getC2(), temp.get(2).getC4());
-					street.c1 = intrsct2;
-					Geometry gi2 = new Geometry("box", i);
-					gi2.setMaterial(mati);
-					gi2.setLocalTranslation( (float) intrsct2.x, (float) intrsct2.y, (float) intrsct2.z );
-					gNode.attachChild( gi2 );
+					Point3d intrsct1 = street.intersect(temp.get(0).getC2(), temp.get(0).getC4(), temp.get(2).getC1(), temp.get(2).getC3());
+					street.c2 = intrsct1;
 				}
 
-				if (temp.get(3) != null) {
-					Point3d intrsct3 = street.intersect(temp.get(0).getC1(), temp.get(0).getC3(), temp.get(3).getC2(), temp.get(3).getC4());
-					street.c3 = intrsct3;
-					Geometry gi3 = new Geometry("box", i);
-					gi3.setMaterial(mati);
-					gi3.setLocalTranslation( (float) intrsct3.x, (float) intrsct3.y, (float) intrsct3.z );
-					gNode.attachChild( gi3 );
+				if (temp.get(1) != null) {
+					Point3d intrsct2 = street.intersect(temp.get(0).getC1(), temp.get(0).getC3(), temp.get(1).getC2(), temp.get(1).getC4());
+					street.c1 = intrsct2;
 				}
 
 				if (temp.get(4) != null) {
-					Point3d intrsct4 = street.intersect(temp.get(0).getC2(), temp.get(0).getC4(), temp.get(4).getC1(), temp.get(4).getC3());
+					Point3d intrsct3 = street.intersect(temp.get(0).getC3(), temp.get(0).getC1(), temp.get(4).getC4(), temp.get(4).getC2());
+					street.c3 = intrsct3;
+				}
+
+				if (temp.get(3) != null) {
+					Point3d intrsct4 = street.intersect(temp.get(0).getC4(), temp.get(0).getC2(), temp.get(3).getC3(), temp.get(3).getC1());
 					street.c4 = intrsct4;
-					Geometry gi4 = new Geometry("box", i);
-					gi4.setMaterial(mati);
-					gi4.setLocalTranslation( (float) intrsct4.x, (float) intrsct4.y, (float) intrsct4.z );
-					gNode.attachChild( gi4 );
+				}
+
+//				for (Point3d p : new Point3d[] { street.c1} ) {
+				for (Point3d p : new Point3d[] { street.c1, street.c2, street.c3, street.c4} ) {
+					Geometry gi = new Geometry("box", i);
+					gi.setMaterial(mati);
+					gi.setLocalTranslation( (float) p.x, (float) p.y, (float) p.z );
+					gNode.attachChild( gi );
 				}
 
 				// street mesh
