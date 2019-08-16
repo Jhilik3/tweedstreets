@@ -54,14 +54,17 @@ public class GraphGen extends Gen implements ICanSave {
 //		Graph3D myGraph = new Graph3D();
 //		myGraph.put( new Point3d(0,0,0), new Point3d(100, 0, 0));
 //		myGraph.put( new Point3d(0,0,0), new Point3d(0, 0, 100));
-//		myGraph.put( new Point3d(0,0,0), new Point3d(-150, 0, 0));
+//		myGraph.put( new Point3d(0,0,0), new Point3d(-110, 0, 0));
+//		myGraph.put( new Point3d(-150,0,0), new Point3d(-110, 0, 0));
 //		myGraph.put( new Point3d(0,0,0), new Point3d(0, 0, -80));
-
-//		myGraph.put( new Point3d(100, 0, 0), new Point3d(0,0,0));
-//		myGraph.put( new Point3d(0, 0, 100), new Point3d(0,0,0));
-//		myGraph.put( new Point3d(-150, 0, 0), new Point3d(0,0,0));
-//		myGraph.put( new Point3d(0, 0, -170), new Point3d(0,0,0));
-
+//		myGraph.put( new Point3d(0,0,0), new Point3d(10, 0, 50));
+//
+//
+////		myGraph.put( new Point3d(100, 0, 0), new Point3d(0,0,0));
+////		myGraph.put( new Point3d(0, 0, 100), new Point3d(0,0,0));
+////		myGraph.put( new Point3d(-150, 0, 0), new Point3d(0,0,0));
+////		myGraph.put( new Point3d(0, 0, -170), new Point3d(0,0,0));
+//
 //		myGraph.put( new Point3d(100, 0, 0), new Point3d(100,0,50));
 //		myGraph.put( new Point3d(100, 0, 0), new Point3d(100,0,-40));
 //		myGraph.put( new Point3d(100, 0, 0), new Point3d(130,0,0));
@@ -143,70 +146,64 @@ public class GraphGen extends Gen implements ICanSave {
 				street.c3 = new Point3d((p2.x+v.x), (p2.y+v.y), (p2.z+v.z));
 				street.c4 = new Point3d((p2.x-v.x), (p2.y-v.y), (p2.z-v.z));
 
-				debugLineMesh(street);
+//				debugLineMesh(street);
 				createStreetMesh(street);
 
 
 			}
 
-//			// junction polygons
-//			if (p1.streets.size() > 2) {
-//				List<Point3d> intersects = new ArrayList();
-//				List<Street> jstreet = new ArrayList<>();
-//				for (Street s : p1.streets) {
-//					jstreet.add(s);
-//				}
-//				for (Street s : jstreet) {
-//					if (s.getP1() != p1)
-//						s.changeDirection();
-//				}
-//				for (Street s : jstreet) {
-//					int index = jstreet.indexOf(s);
-//					index = (index + 1) % jstreet.size();
-//					Street t = jstreet.get(index);
-//					Point3d i = s.intersect(s.getC1(), s.getC3(), t.getC2(), t.getC4());
-//					intersects.add(i);
-//				}
-//
-//				// junction mesh
-//				Mesh m = new Mesh();
-//				Vector3f[] vert = new Vector3f[intersects.size()];
-//				Vector2f[] textCoord = new Vector2f[intersects.size()];
-//				int i = 0;
-//				for (Point3d in : intersects) {
-//					vert[i] = new Vector3f((float)in.x, (float)in.y, (float)in.z);
-//					textCoord[i] = new Vector2f(0,0);
-//					i++;
-//				}
-//
-//				int[] indices = new int[(intersects.size() - 2)*3];
-//				if (p1.streets.size() == 4) {
-//					indices = new int[] { 0,3,2, 1,0,2 };
-//				}
-//
-//				if (indices != null) {
-//					m.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vert));
-//					m.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(textCoord));
-//					m.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(indices));
-//					//mesh.updateBound();
-//
-//					Geometry g = new Geometry("mesh", m);
-//					g.setCullHint(  Spatial.CullHint.Never );
-//					Material jmat = new Material(tweed.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-////					Texture text = tweed.getAssetManager().loadTexture("road.jpg");
-////					jmat.setTexture("ColorMap", text);
-//					jmat.setColor("Color", new ColorRGBA( 0, 0, 1f, 1f ));
-//					g.setMaterial(jmat);
-//					gNode.attachChild(g);
-//				}
-//			}
+			// junction polygons
+			if (p1.streets.size() > 2) {
+				List<Point3d> intersects = new ArrayList();
+				List<Street> jstreet = new ArrayList<>(p1.getOutwardsGoingStreets());
 
-//			System.out.println("New junction:");
-//			for (Street s : p1.streets) {
-//				System.out.println(s.getVector());
-//			}
-//			System.out.println("");
+				for (Street s : jstreet) {
+					s.corners();
+				}
 
+				for (Street s : jstreet) {
+					int index = jstreet.indexOf(s);
+					index = (index + 1) % jstreet.size();
+					Street t = jstreet.get(index);
+					Point3d i = s.intersect(s.getC1(), s.getC3(), t.getC2(), t.getC4());
+					intersects.add(i);
+				}
+
+				// junction mesh
+				Mesh m = new Mesh();
+				Vector3f[] vert = new Vector3f[intersects.size()];
+				Vector2f[] textCoord = new Vector2f[intersects.size()];
+				int i = 0;
+				for (Point3d in : intersects) {
+					vert[i] = new Vector3f((float)in.x, -1, (float)in.z);
+					textCoord[i] = new Vector2f(0,0);
+					i++;
+				}
+
+				int[] indices = new int[(intersects.size() - 2)*3];
+
+				for (int j = 0, c = 1; j < indices.length; j += 3, c++) {
+					indices[j] = 0;
+					indices[j+1] = c+1;
+					indices[j+2] = c;
+				}
+
+				if (indices != null) {
+					m.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vert));
+					m.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(textCoord));
+					m.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(indices));
+					//mesh.updateBound();
+
+					Geometry g = new Geometry("mesh", m);
+					g.setCullHint(  Spatial.CullHint.Never );
+					Material jmat = new Material(tweed.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+//					Texture text = tweed.getAssetManager().loadTexture("road.jpg");
+//					jmat.setTexture("ColorMap", text);
+					jmat.setColor("Color", new ColorRGBA( 0, 0, 1f, 1f ));
+					g.setMaterial(jmat);
+					gNode.attachChild(g);
+				}
+			}
 		}
 	}
 
@@ -215,7 +212,7 @@ public class GraphGen extends Gen implements ICanSave {
 				street.getJ1().getOutwardsGoingStreets(),
 				street.getJ2().getInwardsGoingStreets ());
 
-		debugTempstreets(temp,street);
+//		debugTempstreets(temp,street);
 
 		Box i = new Box(1f, 1f, 1f);
 		ColorRGBA coli = new ColorRGBA( 1f, 1f , 1f, 1f );
@@ -250,7 +247,7 @@ public class GraphGen extends Gen implements ICanSave {
 					Geometry gi = new Geometry("box", i);
 					gi.setMaterial(mati);
 					gi.setLocalTranslation( (float) p.x, (float) p.y, (float) p.z );
-					gNode.attachChild( gi );
+//					gNode.attachChild( gi );
 				}
 
 		// street mesh
@@ -278,7 +275,7 @@ public class GraphGen extends Gen implements ICanSave {
 		Geometry geo = new Geometry("mesh", mesh);
 		geo.setCullHint(  Spatial.CullHint.Never );
 		Material recmat = new Material(tweed.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture tex = tweed.getAssetManager().loadTexture("road.jpg");
+		Texture tex = tweed.getAssetManager().loadTexture("road2.jpg");
 		tex.setWrap(Texture.WrapMode.Repeat);
 		recmat.setTexture("ColorMap", tex);
 		geo.setMaterial(recmat);
@@ -319,7 +316,7 @@ public class GraphGen extends Gen implements ICanSave {
 		mg.setMaterial( lineMaterial );
 
 		mg.setLocalTranslation( 0, 0, 0 );
-//				gNode.attachChild( mg );
+		gNode.attachChild( mg );
 	}
 
 	private void debugTempstreets(List<Street> temp, Street street) {
